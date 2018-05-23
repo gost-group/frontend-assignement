@@ -1,0 +1,64 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background-color: #1E2230;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-base {
+  animation: spin 1s infinite linear;
+}
+
+.super-chart {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  background-color: #424D6B;
+  border-radius: 5px;
+  box-shadow: 0 0 1px rgba(0,0,0,0.3);
+  transition: all 0.3s;
+}
+
+h1 {
+  color: whitesmoke;
+  margin: 0;
+}
+
+.super-chart__analytics {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+}
+
+.super-chart__analytics div {
+  margin: 3px 5px;
+  padding: 10px 20px;
+  background-color: #AC6C82;
+  color: whitesmoke;
+  border-radius: 3px
+}
+
+.super-chart__analytics__value {
+  font-weight: bold;
+}
+
+svg {
+  margin: 15px 0;
+  border: solid 1px #4E5A7D;
+}
