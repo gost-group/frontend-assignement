@@ -1,40 +1,65 @@
 import React, { Component } from 'react';
 
 import { Loader } from 'core/components/Loader';
+import { fetchPolygon } from '../../../api';
 
 class SuperChart extends Component {
 
-  static numberToPixels(number) {
-    return `${number}px`;
+  state = {
+    isLoaded: false,
+    polygon: [],
+    polygonMaxValues: {
+      xMax: 0,
+      yMax: 0,
+    },
   }
 
-  static polygonToSVGPoints(polygon) {
-    return polygon
-            .map(point => `${point[0]},${point[1]}`)
-            .reduce((a, b) => `${a} ${b}`);
+  numberToPixels = number => `${number}px`;
+
+  polygonToSVGPoints = polygon => {
+    const {xMax,yMax}=this.state.polygonMaxValues;
+    const points= polygon.map(point => `${point[0]},${yMax-point[1]*0.95}`)
+                         .reduce((a, b) => `${a} ${b}`)
+    //костыль, добавил по одной точке в начале и в конце, 
+    //чтобы красиво отображалась площадь под графиком, не нашел пока способа лучше
+    return `-100,${yMax} ${points} ${xMax+100},${yMax}`; 
   }
 
-  constructor() {
-    super();
-    this.state = {
-      isLoaded: false,
-      polygon: [],
-      polygonMaxValues: {
-        xMax: 0,
-        yMax: 0,
-      },
-    };
+  getPolygonMaxValues = polygon => ({
+      xMax: polygon.length,
+      yMax: Math.max.apply(Math,polygon.map((elem) => elem[1]))
+  });
+
+  calcPolygonSquare = polygon => {
+      let square = 0;
+      const line = polygon.map((elem) => elem[1]);
+      for (var i=1; i<line.length;i++)
+        square+=(line[i]+line[i-1])/2
+      return Math.floor(square);
+  }
+
+  componentWillMount(){
+    fetchPolygon().then(
+      result => {
+        this.setState({
+          polygon: result,
+          isLoaded: true,
+          polygonMaxValues: this.getPolygonMaxValues(result)
+        });
+      }
+    )
   }
 
   render() {
     const { width, height } = this.props;
     const { isLoaded, polygon, polygonMaxValues } = this.state;
+    
     return (
       <div
         className="super-chart"
         style={{
-          width:  this.constructor.numberToPixels(width),
-          height: this.constructor.numberToPixels(height),
+          width:  this.numberToPixels(width),
+          height: this.numberToPixels(height),
         }}
       >
         <h1>Super Chart</h1>
@@ -42,21 +67,22 @@ class SuperChart extends Component {
           ? <svg
               width='100%'
               height='100%'
-              viewBox={`0 0 ${polygonMaxValues.xMax} ${polygonMaxValues.yMax}`}
+              viewBox={`0 0 ${polygonMaxValues.xMax-1} ${polygonMaxValues.yMax}`}
               preserveAspectRatio="none"
             >
               <polyline
-                points={this.constructor.polygonToSVGPoints(polygon)}
+                points={this.polygonToSVGPoints(polygon)}
                 fill="#4E5A7D"
                 stroke="#7E91C9"
                 strokeWidth="0.5"
+                fillRule="nonzero"
               />
             </svg>
           : <Loader.loading size={35} />
         }
         <div className="super-chart__analytics">
-          {isLoaded && <div>max <span className="super-chart__analytics__value">{0}</span></div>}
-          {isLoaded && <div>area <span className="super-chart__analytics__value">{0}</span></div>}
+          {isLoaded && <div>max <span className="super-chart__analytics__value">{polygonMaxValues.yMax}</span></div>}
+          {isLoaded && <div>area <span className="super-chart__analytics__value">{this.calcPolygonSquare(polygon)}</span></div>}
         </div>
       </div>
     );
