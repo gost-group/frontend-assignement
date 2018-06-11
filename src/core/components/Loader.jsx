@@ -17,10 +17,10 @@ export const Loader = {
   loading: (props) => {
     const { size = '15px', color = '#FFFFFF', message = null } = props;
     return (
-      <div style={style.loader}>
+      <div style = {style.loader}>
         <div
-          className='loader-base'
-          style={{
+          className = 'loader-base'
+          style = {{
             width: size,
             height: size,
             border: `.25rem solid ${Colors.hexToRgba(color, 0.2)}`,
