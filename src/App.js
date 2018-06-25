@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import SuperChart from 'modules/superChart/components';
+import SuperChart from 'modules/superChart';
 
 class App extends Component {
   render() {
